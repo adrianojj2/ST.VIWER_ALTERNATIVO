@@ -6,6 +6,10 @@ export interface AuthUser {
   phone?: string;
   role: 'SUPER_ADMIN' | 'MANAGER' | 'END_USER';
   mustChangePassword?: boolean;
+  capabilities?: {
+    audio: boolean;
+    recording: boolean;
+  };
 }
 
 export interface Camera {

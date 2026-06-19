@@ -1,5 +1,5 @@
 import { FormEvent, useCallback, useEffect, useRef, useState } from 'react';
-import { KeyRound, Lock, User } from 'lucide-react';
+import { KeyRound, Lock, User, Volume2, VolumeX } from 'lucide-react';
 import {
   changePassword,
   clearSession,
@@ -17,11 +17,11 @@ import type { AuthUser, Camera, StreamSession } from '../types';
 const BRAND_NAME = 'FUNERÁRIA BOM JESUS';
 const PLAYER_WARMUP_MS = 3_500;
 
-function configurePlayerUrl(playerUrl: string) {
+function configurePlayerUrl(playerUrl: string, audioEnabled: boolean) {
   const url = new URL(playerUrl);
-  url.searchParams.set('muted', 'true');
-  url.searchParams.set('autoplay', 'true');
-  url.searchParams.set('controls', 'false');
+  url.searchParams.set('muted', audioEnabled ? 'false' : 'true');
+  url.searchParams.set('autoplay', audioEnabled ? 'false' : 'true');
+  url.searchParams.set('controls', audioEnabled ? 'true' : 'false');
   return url.toString();
 }
 
@@ -238,6 +238,7 @@ export function MemorialViewerPage() {
   const [checkingSession, setCheckingSession] = useState(() => hasStoredSession());
   const [camera, setCamera] = useState<Camera | null>(null);
   const [session, setSession] = useState<StreamSession | null>(null);
+  const [audioEnabled, setAudioEnabled] = useState(false);
   const [status, setStatus] = useState('Aguardando autenticação');
   const [streamError, setStreamError] = useState('');
   const refreshTimer = useRef<number>();
@@ -273,6 +274,7 @@ export function MemorialViewerPage() {
 
   useEffect(() => {
     if (!user || user.mustChangePassword) return;
+    setAudioEnabled(false);
     let active = true;
     setStatus('Localizando câmera autorizada...');
     setStreamError('');
@@ -367,7 +369,10 @@ export function MemorialViewerPage() {
     };
   }, [camera, openSession]);
 
-  const configuredPlayerUrl = session?.playerUrl ? configurePlayerUrl(session.playerUrl) : undefined;
+  const canUseAudio = Boolean(user?.capabilities?.audio);
+  const configuredPlayerUrl = session?.playerUrl
+    ? configurePlayerUrl(session.playerUrl, canUseAudio && audioEnabled)
+    : undefined;
   const mixedContent = Boolean(
     configuredPlayerUrl && window.location.protocol === 'https:' && configuredPlayerUrl.startsWith('http:')
   );
@@ -401,6 +406,17 @@ export function MemorialViewerPage() {
               )}
               {status && configuredPlayerUrl && <div className="stream-status">{status}</div>}
               <Watermark code={session?.watermarkCode} />
+              {canUseAudio && configuredPlayerUrl && !mixedContent && (
+                <button
+                  type="button"
+                  className={`audio-toggle${audioEnabled ? ' audio-toggle-active' : ''}`}
+                  onClick={() => setAudioEnabled((current) => !current)}
+                  aria-label={audioEnabled ? 'Desativar áudio' : 'Ativar áudio'}
+                  title={audioEnabled ? 'Desativar áudio' : 'Ativar áudio'}
+                >
+                  {audioEnabled ? <Volume2 aria-hidden="true" /> : <VolumeX aria-hidden="true" />}
+                </button>
+              )}
             </div>
           </div>
         </section>
