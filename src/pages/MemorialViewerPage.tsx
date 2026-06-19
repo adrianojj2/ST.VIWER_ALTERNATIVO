@@ -395,7 +395,6 @@ export function MemorialViewerPage() {
   const viewerLogoUrl = viewerBrand?.viewerLogoUrl
     ? resolveApiAssetUrl(viewerBrand.viewerLogoUrl)
     : undefined;
-  const headerTitle = viewerBrandName ?? 'TRANSMISSÃO RESERVADA';
 
   return (
     <main className="memorial-page">
@@ -404,10 +403,16 @@ export function MemorialViewerPage() {
 
       <section className="memorial-frame">
         <header className="brand-header">
-          {viewerLogoUrl && <img src={viewerLogoUrl} alt={`Logo de ${headerTitle}`} className="brand-logo" />}
+          {viewerLogoUrl && (
+            <img
+              src={viewerLogoUrl}
+              alt={viewerBrandName ? `Logo de ${viewerBrandName}` : 'Logo do local'}
+              className="brand-logo"
+            />
+          )}
           <div>
-            {viewerBrandName && <p>Transmissão reservada</p>}
-            <h1>{headerTitle}</h1>
+            <p>Transmissão reservada</p>
+            {viewerBrandName && <h1>{viewerBrandName}</h1>}
           </div>
         </header>
 

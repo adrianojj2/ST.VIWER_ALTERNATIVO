@@ -294,7 +294,7 @@ function ConfigPanel({ user, onLogout }: { user: AuthUser; onLogout: () => void 
                 value={brandName}
                 onChange={(event) => setBrandName(event.target.value)}
                 maxLength={120}
-                placeholder="Deixe vazio para usar Transmissão Reservada"
+                placeholder="Deixe vazio para não exibir nome"
               />
 
               <label>Logo</label>

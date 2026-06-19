@@ -11,7 +11,8 @@ SYSTEM VISION.
 - abre essa camera automaticamente, sem sidebar, mosaico ou controles extras;
 - identifica o local pelo equipamento da camera autorizada;
 - aplica o nome e o logo configurados para esse local;
-- usa `TRANSMISSAO RESERVADA` quando o local nao possui identidade visual;
+- mantem `TRANSMISSAO RESERVADA` e a frase inferior em todos os locais;
+- deixa nome e logo vazios quando o local nao possui identidade visual;
 - mantem a marca d'agua e a renovacao silenciosa da sessao de stream;
 - guarda login apenas em `sessionStorage`: fechar a aba, janela ou app remove a
   sessao local; atualizar a mesma pagina preserva o acesso;
