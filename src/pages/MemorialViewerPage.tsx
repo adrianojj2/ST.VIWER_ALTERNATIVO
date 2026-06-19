@@ -6,15 +6,16 @@ import {
   createStreamSession,
   endStreamSession,
   getCameras,
+  getLocations,
   getStoredAuthUser,
   hasStoredSession,
   heartbeatStreamSession,
   login,
   refreshSession,
+  resolveApiAssetUrl,
 } from '../services';
-import type { AuthUser, Camera, StreamSession } from '../types';
+import type { AuthUser, Camera, Location, StreamSession } from '../types';
 
-const BRAND_NAME = 'FUNERÁRIA BOM JESUS';
 const PLAYER_WARMUP_MS = 3_500;
 
 function configurePlayerUrl(playerUrl: string, audioEnabled: boolean) {
@@ -237,6 +238,7 @@ export function MemorialViewerPage() {
   const [user, setUser] = useState<AuthUser | null>(() => getStoredAuthUser());
   const [checkingSession, setCheckingSession] = useState(() => hasStoredSession());
   const [camera, setCamera] = useState<Camera | null>(null);
+  const [viewerBrand, setViewerBrand] = useState<Location | null>(null);
   const [session, setSession] = useState<StreamSession | null>(null);
   const [audioEnabled, setAudioEnabled] = useState(false);
   const [status, setStatus] = useState('Aguardando autenticação');
@@ -250,6 +252,7 @@ export function MemorialViewerPage() {
     function expireAuth() {
       setUser(null);
       setCamera(null);
+      setViewerBrand(null);
       setSession(null);
       setStatus('Aguardando autenticação');
     }
@@ -275,6 +278,7 @@ export function MemorialViewerPage() {
   useEffect(() => {
     if (!user || user.mustChangePassword) return;
     setAudioEnabled(false);
+    setViewerBrand(null);
     let active = true;
     setStatus('Localizando câmera autorizada...');
     setStreamError('');
@@ -292,7 +296,18 @@ export function MemorialViewerPage() {
           );
           return;
         }
-        setCamera(cameras[0]);
+        const authorizedCamera = cameras[0];
+        setCamera(authorizedCamera);
+        void getLocations()
+          .then((locations) => {
+            if (!active) return;
+            setViewerBrand(
+              locations.find((location) => location.equipmentIds.includes(authorizedCamera.equipmentId)) ?? null
+            );
+          })
+          .catch(() => {
+            if (active) setViewerBrand(null);
+          });
       })
       .catch((reason) => {
         if (!active) return;
@@ -376,6 +391,11 @@ export function MemorialViewerPage() {
   const mixedContent = Boolean(
     configuredPlayerUrl && window.location.protocol === 'https:' && configuredPlayerUrl.startsWith('http:')
   );
+  const viewerBrandName = viewerBrand?.viewerBrandName?.trim();
+  const viewerLogoUrl = viewerBrand?.viewerLogoUrl
+    ? resolveApiAssetUrl(viewerBrand.viewerLogoUrl)
+    : undefined;
+  const headerTitle = viewerBrandName ?? 'TRANSMISSÃO RESERVADA';
 
   return (
     <main className="memorial-page">
@@ -384,10 +404,10 @@ export function MemorialViewerPage() {
 
       <section className="memorial-frame">
         <header className="brand-header">
-          <img src="/funeraria-logo.png" alt="Pássaro da Funerária Bom Jesus" className="brand-logo" />
+          {viewerLogoUrl && <img src={viewerLogoUrl} alt={`Logo de ${headerTitle}`} className="brand-logo" />}
           <div>
-            <p>Transmissão reservada</p>
-            <h1>{BRAND_NAME}</h1>
+            {viewerBrandName && <p>Transmissão reservada</p>}
+            <h1>{headerTitle}</h1>
           </div>
         </header>
 
@@ -400,7 +420,7 @@ export function MemorialViewerPage() {
                 <SeamlessPlayer url={configuredPlayerUrl} title={camera?.name ?? 'Transmissão ao vivo'} />
               ) : (
                 <div className="stream-state">
-                  <img src="/funeraria-logo.png" alt="" />
+                  <img src={viewerLogoUrl ?? '/system-vision-emblem.png'} alt="" />
                   <p>{mixedContent ? 'A transmissão requer uma conexão segura.' : streamError || status}</p>
                 </div>
               )}

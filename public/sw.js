@@ -1,10 +1,9 @@
-const CACHE_NAME = 'funeraria-bom-jesus-v2';
+const CACHE_NAME = 'system-vision-reserved-v3';
 const APP_SHELL = [
   '/',
   '/manifest.webmanifest',
   '/pwa-icon.png',
   '/pwa-icon-192.png',
-  '/funeraria-logo.png',
   '/system-vision-logo.png',
   '/system-vision-emblem.png',
 ];

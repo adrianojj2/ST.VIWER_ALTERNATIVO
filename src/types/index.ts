@@ -21,6 +21,16 @@ export interface Camera {
   status: 'online' | 'offline';
 }
 
+export interface Location {
+  id: string;
+  name: string;
+  description?: string;
+  viewerBrandName?: string;
+  viewerLogoUrl?: string;
+  active: boolean;
+  equipmentIds: string[];
+}
+
 export interface StreamSession {
   hlsUrl: string;
   playerUrl: string;
