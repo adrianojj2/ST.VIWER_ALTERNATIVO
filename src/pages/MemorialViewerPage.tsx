@@ -1,4 +1,5 @@
 import { FormEvent, useCallback, useEffect, useRef, useState } from 'react';
+import { KeyRound, Lock, User } from 'lucide-react';
 import {
   changePassword,
   clearSession,
@@ -105,31 +106,42 @@ function LoginOverlay({ onAuthenticated }: { onAuthenticated: (user: AuthUser) =
   return (
     <div className="auth-backdrop">
       <section className="auth-card" aria-labelledby="login-title">
-        <img src="/funeraria-logo.png" alt="" className="auth-bird" />
-        <p className="auth-eyebrow">Acesso reservado</p>
-        <h2 id="login-title">Transmissão ao vivo</h2>
-        <p className="auth-copy">Entre para visualizar a câmera autorizada para esta conta.</p>
+        <div className="auth-brand">
+          <div className="auth-brand-logo-wrap">
+            <span aria-hidden="true" />
+            <img src="/system-vision-logo.png" alt="System Vision" className="auth-system-logo" />
+          </div>
+          <p id="login-title">Plataforma de Monitoramento Compartilhado</p>
+        </div>
 
         <form onSubmit={submit} className="auth-form">
           <label htmlFor="username">Usuário, e-mail ou telefone</label>
-          <input
-            id="username"
-            value={username}
-            onChange={(event) => setUsername(event.target.value)}
-            autoComplete="username"
-            autoFocus
-            required
-          />
+          <div className="auth-input-wrap">
+            <User aria-hidden="true" />
+            <input
+              id="username"
+              value={username}
+              onChange={(event) => setUsername(event.target.value)}
+              autoComplete="username"
+              placeholder="Digite seu acesso"
+              autoFocus
+              required
+            />
+          </div>
 
           <label htmlFor="password">Senha</label>
-          <input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            autoComplete="current-password"
-            required
-          />
+          <div className="auth-input-wrap">
+            <Lock aria-hidden="true" />
+            <input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              autoComplete="current-password"
+              placeholder="Digite sua senha"
+              required
+            />
+          </div>
 
           {error && <p className="auth-error" role="alert">{error}</p>}
 
@@ -137,6 +149,8 @@ function LoginOverlay({ onAuthenticated }: { onAuthenticated: (user: AuthUser) =
             {submitting ? 'Entrando...' : 'Entrar'}
           </button>
         </form>
+
+        <p className="auth-restricted">Acesso restrito a usuários cadastrados.</p>
       </section>
     </div>
   );
@@ -173,32 +187,40 @@ function ChangePasswordOverlay({ user, onChanged }: { user: AuthUser; onChanged:
   return (
     <div className="auth-backdrop">
       <section className="auth-card" aria-labelledby="password-title">
-        <img src="/funeraria-logo.png" alt="" className="auth-bird" />
+        <img src="/system-vision-emblem.png" alt="System Vision" className="auth-emblem" />
         <p className="auth-eyebrow">Primeiro acesso</p>
         <h2 id="password-title">Crie sua senha</h2>
         <p className="auth-copy">Olá, {user.name}. Defina sua senha pessoal para abrir a transmissão.</p>
 
         <form onSubmit={submit} className="auth-form">
           <label htmlFor="new-password">Nova senha</label>
-          <input
-            id="new-password"
-            type="password"
-            value={newPassword}
-            onChange={(event) => setNewPassword(event.target.value)}
-            autoComplete="new-password"
-            autoFocus
-            required
-          />
+          <div className="auth-input-wrap">
+            <KeyRound aria-hidden="true" />
+            <input
+              id="new-password"
+              type="password"
+              value={newPassword}
+              onChange={(event) => setNewPassword(event.target.value)}
+              autoComplete="new-password"
+              placeholder="Digite a nova senha"
+              autoFocus
+              required
+            />
+          </div>
 
           <label htmlFor="confirm-password">Confirmar nova senha</label>
-          <input
-            id="confirm-password"
-            type="password"
-            value={confirmation}
-            onChange={(event) => setConfirmation(event.target.value)}
-            autoComplete="new-password"
-            required
-          />
+          <div className="auth-input-wrap">
+            <KeyRound aria-hidden="true" />
+            <input
+              id="confirm-password"
+              type="password"
+              value={confirmation}
+              onChange={(event) => setConfirmation(event.target.value)}
+              autoComplete="new-password"
+              placeholder="Confirme a nova senha"
+              required
+            />
+          </div>
 
           {error && <p className="auth-error" role="alert">{error}</p>}
 

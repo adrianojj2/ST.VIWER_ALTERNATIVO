@@ -305,8 +305,12 @@ input {
   display: grid;
   place-items: center;
   padding: 20px;
-  background: rgba(12, 28, 35, 0.48);
-  backdrop-filter: blur(12px) saturate(0.75);
+  background:
+    linear-gradient(rgba(45, 58, 62, 0.12) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(45, 58, 62, 0.12) 1px, transparent 1px),
+    rgba(218, 222, 222, 0.9);
+  background-size: 4rem 4rem;
+  backdrop-filter: blur(13px) saturate(0.55);
 }
 
 .auth-card {
@@ -314,24 +318,61 @@ input {
   width: min(430px, 100%);
   max-height: calc(100dvh - 40px);
   overflow-y: auto;
-  padding: 28px clamp(22px, 6vw, 38px) 32px;
-  border: 1px solid rgba(177, 139, 67, 0.74);
-  border-radius: 22px;
-  color: #17384a;
-  background: rgba(255, 252, 245, 0.97);
-  box-shadow: 0 30px 90px rgba(5, 17, 23, 0.45), inset 0 0 0 5px rgba(177, 139, 67, 0.11);
+  padding: 32px clamp(22px, 6vw, 38px);
+  border: 1px solid #c7cecc;
+  border-radius: 16px;
+  color: #20312c;
+  background: rgba(239, 242, 241, 0.98);
+  box-shadow: 0 26px 70px rgba(27, 37, 34, 0.3), inset 0 0 0 1px rgba(255, 255, 255, 0.78);
   text-align: center;
 }
 
-.auth-bird {
-  width: 92px;
-  height: 68px;
+.auth-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.auth-brand-logo-wrap {
+  position: relative;
+  margin-bottom: 18px;
+}
+
+.auth-brand-logo-wrap span {
+  position: absolute;
+  inset: 8% 4%;
+  border-radius: 18px;
+  background: rgba(34, 197, 94, 0.16);
+  filter: blur(18px);
+  transform: scale(1.35);
+}
+
+.auth-system-logo {
+  position: relative;
+  width: 160px;
+  height: auto;
+  display: block;
   object-fit: contain;
 }
 
+.auth-brand p {
+  margin: 0;
+  color: #66726e;
+  font: 0.86rem/1.45 Arial, sans-serif;
+}
+
+.auth-emblem {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  margin-bottom: 14px;
+  filter: drop-shadow(0 8px 16px rgba(34, 197, 94, 0.15));
+}
+
 .auth-eyebrow {
-  margin: 6px 0 4px;
-  color: #9a7738;
+  margin: 0 0 6px;
+  color: #36814b;
   font: 700 0.68rem/1.2 Arial, sans-serif;
   letter-spacing: 0.22em;
   text-transform: uppercase;
@@ -339,7 +380,7 @@ input {
 
 .auth-card h2 {
   margin: 0;
-  color: #0d466c;
+  color: #18352b;
   font-size: clamp(1.65rem, 7vw, 2.25rem);
   font-weight: 500;
 }
@@ -359,25 +400,45 @@ input {
 
 .auth-form label {
   margin-top: 5px;
-  color: #4e5d62;
+  color: #3b4b46;
   font: 600 0.75rem/1.2 Arial, sans-serif;
+}
+
+.auth-input-wrap {
+  position: relative;
+}
+
+.auth-input-wrap > svg {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: 12px;
+  width: 16px;
+  height: 16px;
+  color: #71807b;
+  transform: translateY(-50%);
+  pointer-events: none;
 }
 
 .auth-form input {
   width: 100%;
   height: 46px;
-  border: 1px solid #cfc4ad;
+  border: 1px solid #c6cecb;
   border-radius: 9px;
   outline: none;
-  padding: 0 13px;
-  color: #15374b;
-  background: #fffefa;
+  padding: 0 13px 0 38px;
+  color: #1d312a;
+  background: #f8faf9;
   transition: border-color 150ms ease, box-shadow 150ms ease;
 }
 
+.auth-form input::placeholder {
+  color: #8a9692;
+}
+
 .auth-form input:focus {
-  border-color: #157aa0;
-  box-shadow: 0 0 0 3px rgba(21, 122, 160, 0.13);
+  border-color: #22c55e;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.14);
 }
 
 .auth-form button {
@@ -386,8 +447,8 @@ input {
   border: 0;
   border-radius: 9px;
   color: white;
-  background: linear-gradient(135deg, #0c6488, #0b3e66);
-  box-shadow: 0 10px 24px rgba(11, 62, 102, 0.25);
+  background: #16a34a;
+  box-shadow: 0 10px 24px rgba(22, 101, 52, 0.25);
   cursor: pointer;
   font: 700 0.86rem/1 Arial, sans-serif;
   letter-spacing: 0.04em;
@@ -400,6 +461,12 @@ input {
 .auth-form button:disabled {
   cursor: wait;
   opacity: 0.7;
+}
+
+.auth-restricted {
+  margin: 24px 0 0;
+  color: #7c8884;
+  font: 0.72rem/1.4 Arial, sans-serif;
 }
 
 .auth-error {
