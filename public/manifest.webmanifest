@@ -1,0 +1,21 @@
+{
+  "id": "/",
+  "name": "Funeraria Bom Jesus",
+  "short_name": "Bom Jesus",
+  "description": "Transmissao ao vivo da Funeraria Bom Jesus",
+  "lang": "pt-BR",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f4eddf",
+  "theme_color": "#f4eddf",
+  "icons": [
+    {
+      "src": "/pwa-icon.png",
+      "sizes": "1254x1254",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
