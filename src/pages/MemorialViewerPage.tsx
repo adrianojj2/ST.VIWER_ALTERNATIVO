@@ -11,12 +11,14 @@ import {
   hasStoredSession,
   heartbeatStreamSession,
   login,
+  loginWithTemporaryAccess,
   refreshSession,
   resolveApiAssetUrl,
 } from '../services';
 import type { AuthUser, Camera, Location, StreamSession } from '../types';
 
 const PLAYER_WARMUP_MS = 3_500;
+const initialTemporaryAccessToken = consumeTemporaryAccessToken();
 
 function configurePlayerUrl(playerUrl: string, audioEnabled: boolean) {
   const url = new URL(playerUrl);
@@ -85,10 +87,16 @@ function Watermark({ code }: { code?: string }) {
   return <span className={`watermark ${watermarkPositions[position]}`}>{code}</span>;
 }
 
-function LoginOverlay({ onAuthenticated }: { onAuthenticated: (user: AuthUser) => void }) {
+function LoginOverlay({
+  onAuthenticated,
+  initialError = '',
+}: {
+  onAuthenticated: (user: AuthUser) => void;
+  initialError?: string;
+}) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [error, setError] = useState(initialError);
   const [submitting, setSubmitting] = useState(false);
 
   async function submit(event: FormEvent) {
@@ -235,14 +243,18 @@ function ChangePasswordOverlay({ user, onChanged }: { user: AuthUser; onChanged:
 }
 
 export function MemorialViewerPage() {
+  const [temporaryAccessToken] = useState(initialTemporaryAccessToken);
   const [user, setUser] = useState<AuthUser | null>(() => getStoredAuthUser());
-  const [checkingSession, setCheckingSession] = useState(() => hasStoredSession());
+  const [checkingSession, setCheckingSession] = useState(
+    () => Boolean(temporaryAccessToken) || hasStoredSession()
+  );
   const [camera, setCamera] = useState<Camera | null>(null);
   const [viewerBrand, setViewerBrand] = useState<Location | null>(null);
   const [session, setSession] = useState<StreamSession | null>(null);
   const [audioEnabled, setAudioEnabled] = useState(false);
   const [status, setStatus] = useState('Aguardando autenticação');
   const [streamError, setStreamError] = useState('');
+  const [temporaryAccessError, setTemporaryAccessError] = useState('');
   const refreshTimer = useRef<number>();
   const retryTimer = useRef<number>();
   const heartbeatTimer = useRef<number>();
@@ -261,6 +273,26 @@ export function MemorialViewerPage() {
   }, []);
 
   useEffect(() => {
+    if (temporaryAccessToken) {
+      clearSession();
+      setStatus('Validando acesso temporario...');
+      void loginWithTemporaryAccess(temporaryAccessToken)
+        .then((authenticatedUser) => {
+          setUser(authenticatedUser);
+          setTemporaryAccessError('');
+        })
+        .catch((reason) => {
+          clearSession();
+          setUser(null);
+          setStatus('Aguardando autenticacao');
+          setTemporaryAccessError(
+            reason instanceof Error ? reason.message : 'Link temporario invalido ou expirado.'
+          );
+        })
+        .finally(() => setCheckingSession(false));
+      return;
+    }
+
     if (!hasStoredSession()) {
       setCheckingSession(false);
       return;
@@ -273,7 +305,7 @@ export function MemorialViewerPage() {
         setUser(null);
       })
       .finally(() => setCheckingSession(false));
-  }, []);
+  }, [temporaryAccessToken]);
 
   useEffect(() => {
     if (!user || user.mustChangePassword) return;
@@ -458,10 +490,30 @@ export function MemorialViewerPage() {
           <div className="session-loader" aria-label="Validando sessão" />
         </div>
       )}
-      {!checkingSession && !user && <LoginOverlay onAuthenticated={setUser} />}
+      {!checkingSession && !user && (
+        <LoginOverlay onAuthenticated={setUser} initialError={temporaryAccessError} />
+      )}
       {!checkingSession && user?.mustChangePassword && (
         <ChangePasswordOverlay user={user} onChanged={setUser} />
       )}
     </main>
   );
+}
+
+function consumeTemporaryAccessToken() {
+  const hash = window.location.hash.startsWith('#')
+    ? window.location.hash.slice(1)
+    : window.location.hash;
+  const params = new URLSearchParams(hash);
+  const token = params.get('acesso')?.trim();
+  if (!token) return undefined;
+
+  params.delete('acesso');
+  const remainingHash = params.toString();
+  window.history.replaceState(
+    null,
+    document.title,
+    `${window.location.pathname}${window.location.search}${remainingHash ? `#${remainingHash}` : ''}`
+  );
+  return token;
 }

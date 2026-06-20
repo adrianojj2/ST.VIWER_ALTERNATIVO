@@ -99,6 +99,15 @@ export async function login(username: string, password: string): Promise<AuthUse
   return response.user;
 }
 
+export async function loginWithTemporaryAccess(token: string): Promise<AuthUser> {
+  const response = await api<LoginResponse>('/api/auth/temporary-access', {
+    method: 'POST',
+    body: { token },
+  });
+  storeSession(response);
+  return response.user;
+}
+
 export async function refreshSession(): Promise<AuthUser> {
   const response = await api<LoginResponse>('/api/auth/refresh', { method: 'POST' });
   storeSession(response);

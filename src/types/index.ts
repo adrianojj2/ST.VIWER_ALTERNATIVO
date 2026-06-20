@@ -10,6 +10,7 @@ export interface AuthUser {
     audio: boolean;
     recording: boolean;
   };
+  expiresAt?: string;
 }
 
 export interface Camera {
